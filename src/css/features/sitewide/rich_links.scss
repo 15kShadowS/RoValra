@@ -137,3 +137,15 @@
     white-space: pre-line;
     color: var(--rovalra-secondary-text-color);
 }
+
+.rovalra-rich-card-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rovalra-rich-card-price {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}

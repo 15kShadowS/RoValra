@@ -2195,10 +2195,11 @@
     },
     "richLinks": {
         "by": "By {{name}}",
-        "members": "{{count}} members",
-        "playing": "{{count}} playing",
-        "visits": "{{count}} visits",
-        "price": "{{price}} Robux",
-        "loading": "Loading..."
+        "members": "{{count}} Members",
+        "playing": "{{count}} Playing",
+        "visits": "{{count}} Visits",
+        "loading": "Loading...",
+        "free": "Free",
+        "offSale": "Off sale"
     }
 }

@@ -3,6 +3,8 @@ import { callRobloxApiJson } from '../../core/api.js';
 import { getUniversesDetails } from '../../core/apis/games.js';
 import { getBatchThumbnails } from '../../core/thumbnail/thumbnails.js';
 import { getAssets } from '../../core/assets.js';
+import { createRobuxIcon } from '../../core/ui/robuxIcon.js';
+import { createPill } from '../../core/ui/general/pill.js';
 import { ts } from '../../core/locale/i18n.js';
 import { settings } from '../../core/settings/getSettings.js';
 
@@ -298,14 +300,8 @@ async function loadDetails(link, data) {
                 ? ts('richLinks.by', { name: data.creator })
                 : null,
             subtitleVerified: data.creatorVerified,
-            stats:
-                typeof data.price === 'number'
-                    ? [
-                          ts('richLinks.price', {
-                              price: data.price.toLocaleString(),
-                          }),
-                      ]
-                    : [],
+            stats: [],
+            price: data.price,
             description: null,
         };
     };
@@ -366,10 +362,13 @@ function renderCard(link, data, extra) {
     header.append(text);
 
     const parts = [header];
-    if (extra?.stats?.length) {
+    const pills = [...(extra?.stats || []).map((stat) => createPill(stat))];
+    if (extra && 'price' in extra)
+        pills.push(createPill(createPrice(extra.price)));
+    if (pills.length) {
         const stats = document.createElement('div');
-        stats.className = 'rovalra-rich-card-stats text-caption-medium';
-        stats.textContent = extra.stats.join(' · ');
+        stats.className = 'rovalra-rich-card-pills';
+        stats.append(...pills);
         parts.push(stats);
     }
     if (extra?.description) {
@@ -385,6 +384,18 @@ function renderCard(link, data, extra) {
         parts.push(loading);
     }
     card.replaceChildren(...parts);
+}
+
+function createPrice(price) {
+    if (typeof price !== 'number') return ts('richLinks.offSale');
+    if (price === 0) return ts('richLinks.free');
+
+    const content = document.createElement('span');
+    content.className = 'rovalra-rich-card-price';
+    const amount = document.createElement('span');
+    amount.textContent = price.toLocaleString();
+    content.append(createRobuxIcon({ size: '16px' }), amount);
+    return content;
 }
 
 function scheduleCard(anchor, link, data) {
