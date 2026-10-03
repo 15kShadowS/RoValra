@@ -293,6 +293,24 @@ if (fs.existsSync('manifest.json')) {
     try {
         const manifestContent = fs.readFileSync('manifest.json', 'utf8');
         const manifestJson = JSON.parse(manifestContent);
+        if (process.argv.includes('--firefox')) {
+            // Firefox has no MV3 service workers: run background.js as an event page instead
+            manifestJson.background = {
+                scripts: [manifestJson.background.service_worker],
+            };
+            // Firefox only allows contextMenus as a required (no-prompt) permission
+            manifestJson.optional_permissions =
+                manifestJson.optional_permissions.filter(
+                    (p) => p !== 'contextMenus',
+                );
+            manifestJson.permissions.push('contextMenus');
+            manifestJson.browser_specific_settings = {
+                gecko: {
+                    id: 'rovalra-personal@15kshadows',
+                    strict_min_version: '128.0', // content scripts with world: MAIN
+                },
+            };
+        }
         fs.writeFileSync('dist/manifest.json', JSON.stringify(manifestJson));
     } catch (e) {
         console.log(e);

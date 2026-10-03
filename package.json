@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "npm run clean && node build.js",
+    "build:firefox": "npm run clean && node build.js --firefox",
     "clean": "rimraf dist",
     "lint": "eslint ."
   },
