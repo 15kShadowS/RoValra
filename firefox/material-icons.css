@@ -1,0 +1,17 @@
+/* Firefox-only: Google's Material Icons stylesheet is blocked when a content
+   script adds it with crossorigin (Firefox can't attach an Origin header for
+   content-script loads), so the fonts ship inside the extension instead. */
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url('fonts/MaterialIcons.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Material Icons Outlined';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url('fonts/MaterialIconsOutlined.woff2') format('woff2');
+}

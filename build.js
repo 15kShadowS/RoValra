@@ -326,6 +326,18 @@ if (fs.existsSync('manifest.json')) {
                 '*://fonts.gstatic.com/*',
                 '*://api.thecatapi.com/*',
             );
+            // Bundled Material Icons (see firefox/material-icons.css)
+            fs.mkdirSync('dist/css/fonts', { recursive: true });
+            fs.copyFileSync('firefox/material-icons.css', 'dist/css/material-icons.css');
+            for (const font of fs.readdirSync('firefox/fonts')) {
+                fs.copyFileSync(
+                    path.join('firefox', 'fonts', font),
+                    path.join('dist', 'css', 'fonts', font),
+                );
+            }
+            manifestJson.content_scripts
+                .find((script) => script.css)
+                .css.push('css/material-icons.css');
             manifestJson.browser_specific_settings = {
                 gecko: {
                     id: 'rovalra-personal@15kshadows',
