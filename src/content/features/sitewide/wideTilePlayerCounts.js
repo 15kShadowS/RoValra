@@ -76,7 +76,8 @@ function abbr(number) {
 const scheduleIdle = (() => {
     let pending = false;
     const requestIdle =
-        window.requestIdleCallback || ((callback) => setTimeout(callback, 300));
+        window.requestIdleCallback?.bind(window) ||
+        ((callback) => setTimeout(callback, 300));
 
     return (callback) => {
         if (pending) return;

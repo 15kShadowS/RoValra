@@ -31,6 +31,12 @@ const interceptEntryPath = path.join(
 );
 const contentEntryPath = path.join(__dirname, 'src', 'content', 'index.js');
 
+const isFirefox = process.argv.includes('--firefox');
+const firefoxShim = (name) =>
+    isFirefox
+        ? fs.readFileSync(path.join(__dirname, 'firefox', name), 'utf8') + '\n'
+        : '';
+
 const manifestPath = path.join(__dirname, 'manifest.json');
 const packagePath = path.join(__dirname, 'package.json');
 let pkg;
@@ -99,6 +105,7 @@ esbuild
         entryPoints: [backgroundEntryPath],
         outfile: 'dist/background.js',
         bundle: true,
+        banner: { js: bannerText + '\n' + firefoxShim('background-shim.js') },
     })
     .catch(() => process.exit(1));
 
@@ -187,7 +194,11 @@ esbuild
         bundle: true,
         // This injects Draco directly into the content script context for roavatar-renderer
         banner: {
-            js: bannerText + '\n' + dracoSource,
+            js:
+                bannerText +
+                '\n' +
+                firefoxShim('content-shim.js') +
+                dracoSource,
         },
     })
     .catch(() => process.exit(1));
@@ -293,7 +304,7 @@ if (fs.existsSync('manifest.json')) {
     try {
         const manifestContent = fs.readFileSync('manifest.json', 'utf8');
         const manifestJson = JSON.parse(manifestContent);
-        if (process.argv.includes('--firefox')) {
+        if (isFirefox) {
             // Firefox has no MV3 service workers: run background.js as an event page instead
             manifestJson.background = {
                 scripts: [manifestJson.background.service_worker],
@@ -304,6 +315,17 @@ if (fs.existsSync('manifest.json')) {
                     (p) => p !== 'contextMenus',
                 );
             manifestJson.permissions.push('contextMenus');
+            // Hosts fetched outside *.roblox.com (relayed via firefox/background-shim.js)
+            manifestJson.host_permissions.push(
+                '*://*.rbxcdn.com/*',
+                '*://*.rovalra.com/*',
+                '*://*.rolimons.com/*',
+                '*://*.roseal.live/*',
+                '*://flagcdn.com/*',
+                '*://fonts.googleapis.com/*',
+                '*://fonts.gstatic.com/*',
+                '*://api.thecatapi.com/*',
+            );
             manifestJson.browser_specific_settings = {
                 gecko: {
                     id: 'rovalra-personal@15kshadows',

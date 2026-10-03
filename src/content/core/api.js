@@ -87,6 +87,12 @@ function recordRateLimitCooldown(key, response) {
     );
 }
 
+function headersToObject(headers) {
+    const result = {};
+    headers.forEach((value, key) => (result[key] = value));
+    return result;
+}
+
 function getRovalraUserAgent() {
     if (cachedRovalraUserAgent) return cachedRovalraUserAgent;
 
@@ -447,9 +453,8 @@ export async function callRobloxApi(options) {
                             fullUrl: customFullUrl,
                             method,
                             body,
-                            headers: Object.fromEntries(
-                                normalizedHeaders.entries(),
-                            ),
+                            // forEach, not entries(): Firefox Xrays can't iterate Headers
+                            headers: headersToObject(normalizedHeaders),
                             noCache,
                             responseType,
                         },
